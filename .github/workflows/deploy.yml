@@ -1,0 +1,57 @@
+name: Build Qt WASM and Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Emscripten
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git
+          cd emsdk
+          ./emsdk install 3.1.37
+          ./emsdk activate 3.1.37
+          echo "EMSDK=$PWD" >> $GITHUB_ENV
+          echo "$PWD/upstream/emscripten" >> $GITHUB_PATH
+
+      - name: Install Qt for WebAssembly
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.6.0'
+          host: 'linux'
+          target: 'desktop'
+          arch: 'wasm_singlethread'
+          install-deps: 'true'
+
+      - name: Build
+        run: |
+          source emsdk/emsdk_env.sh
+          qmake PharmacyManagementSystem.pro
+          make -j4
+
+      - name: Prepare output
+        run: |
+          mkdir -p out
+          cp *.html *.js *.wasm qtloader.js out/ 2>/dev/null || true
+
+      - name: Add COOP/COEP headers (_headers file for Pages)
+        run: |
+          cat > out/_headers << 'EOF'
+          /*
+            Cross-Origin-Opener-Policy: same-origin
+            Cross-Origin-Embedder-Policy: require-corp
+          /*.wasm
+            Content-Type: application/wasm
+          EOF
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
