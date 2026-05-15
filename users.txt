@@ -1,0 +1,2 @@
+1|admin|admin123|Default Admin|Admin
+2|pharmacist|pharma123|Default Pharmacist|Pharmacist
