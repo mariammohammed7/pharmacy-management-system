@@ -20,7 +20,16 @@ jobs:
           echo "EMSDK=$PWD" >> $GITHUB_ENV
           echo "$PWD/upstream/emscripten" >> $GITHUB_PATH
 
-      - name: Install Qt for WebAssembly
+      - name: Install Qt (desktop host + WASM)
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.6.0'
+          host: 'linux'
+          target: 'desktop'
+          arch: 'gcc_64'
+          install-deps: 'true'
+
+      - name: Install Qt WASM kit
         uses: jurplel/install-qt-action@v3
         with:
           version: '6.6.0'
@@ -32,7 +41,8 @@ jobs:
       - name: Build
         run: |
           source emsdk/emsdk_env.sh
-          qmake PharmacyManagementSystem.pro
+          export QMAKE=$Qt6_DIR/../wasm_singlethread/bin/qmake
+          $QMAKE PharmacyManagementSystem.pro
           make -j4
 
       - name: Prepare output
@@ -40,7 +50,7 @@ jobs:
           mkdir -p out
           cp *.html *.js *.wasm qtloader.js out/ 2>/dev/null || true
 
-      - name: Add COOP/COEP headers (_headers file for Pages)
+      - name: Add headers
         run: |
           cat > out/_headers << 'EOF'
           /*
