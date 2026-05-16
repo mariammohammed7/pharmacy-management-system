@@ -42,8 +42,8 @@ jobs:
         run: |
           source emsdk/emsdk_env.sh
           export QMAKE=$Qt6_DIR/../wasm_singlethread/bin/qmake
-          $QMAKE PharmacyManagementSystem.pro "QMAKE_LFLAGS += -sASYNCIFY"
-
+          $QMAKE PharmacyManagementSystem.pro
+          echo "QMAKE_LFLAGS += -sASYNCIFY" >> .qmake.conf
           make -j4
 
       - name: Prepare output
