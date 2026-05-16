@@ -42,7 +42,8 @@ jobs:
         run: |
           source emsdk/emsdk_env.sh
           export QMAKE=$Qt6_DIR/../wasm_singlethread/bin/qmake
-          $QMAKE pharmacy-management-system.pro
+          $QMAKE PharmacyManagementSystem.pro
+
           make -j4
 
       - name: Prepare output
