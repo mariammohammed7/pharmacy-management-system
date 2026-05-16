@@ -31,3 +31,5 @@ HEADERS += \
     dispensedialog.h \
     userdialog.h \
     reportdialog.h
+# WebAssembly asyncify support
+wasm: QMAKE_LFLAGS += -sASYNCIFY
