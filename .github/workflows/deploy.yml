@@ -42,13 +42,18 @@ jobs:
         run: |
           source emsdk/emsdk_env.sh
           export QMAKE=$Qt6_DIR/../wasm_singlethread/bin/qmake
-          $QMAKE PharmacyManagementSystem.pro
+          $QMAKE pharmacy-management-system.pro
           make -j4
 
       - name: Prepare output
         run: |
           mkdir -p out
           cp *.html *.js *.wasm qtloader.js out/ 2>/dev/null || true
+          cd out
+          HTML_FILE=$(ls *.html | head -n 1)
+          if [ "$HTML_FILE" != "index.html" ]; then
+            mv "$HTML_FILE" index.html
+          fi
 
       - name: Add headers
         run: |
